@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heat Treatment "ISPM 15" Certificate</title>
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+
+  body {
+    font-family: 'Merriweather', serif;
+    background-color: #f0f0f0;
+    padding: 2rem;
+  }
+  .certificate-container {
+    width: 260mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+    background-color: white;
+    padding: 1.5rem;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  /* Table styles for borders */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  td, th {
+    border: 1px solid black;
+    padding: 6px;
+    font-size: 11pt;
+    vertical-align: top;
+  }
+  .no-border { border: none; }
+  .border-right { border-right: 1px solid black; }
+  .border-bottom { border-bottom: 1px solid black; }
+  .stamp {
+    border: 2px solid black;
+    padding: 0.25rem 0.5rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 1rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="certificate-container mx-auto">
+ {{#if includeHeader}}
+<!-- Header -->
+  <header class="flex justify-between items-start mb-4">
+     <!-- Logo Image -->
+     <img src="{{logoPath}}" alt="Company Logo" style="height: 200px;" class="h-[72px] w-auto object-contain" />
+
+    <div class="text-left my-10">
+      <h1 class="text-3xl font-bold">Shree Jalaram Wood Works</h1>
+      <p class="text-sm text-gray-700 font-family">Mfg. Of Wood Pallets of ISPM-15 Certified</p>
+     
+    </div>
+    <div class="text-right text-sm text-gray-700">
+      <p class="text-xs"><strong>Dharampur Road, At & Post Vankal<br>Dist Valsad 396001 (Gujarat) India</strong></p><br>
+      <p>+91 9998971461</p>
+      <p>info@jalarampallets.com</p>
+      <p>www.jalarampallets.com</p>
+    </div>
+  </header>
+
+
+
+  <!-- Horizontal Line -->
+  <hr class="border-t-2 border-gray-300 mb-4" />
+
+  {{/if}}
+
+  <!-- Title -->
+  <div class="text-center my-4">
+    <h2 class="text-lg font-bold ">HEAT TREATMENT "ISPM 15" CERTIFICATE</h2>
+  </div>
+
+  <!-- Declaration -->
+  <p class="text-center  text-sm my-3 px-4">
+    This is certify that the following boxes / Pallets / Crates with our logo duly authorised and as per norm ISPM # 15 directed by director of plant protection quarantine, Ministry of Agriculture Govt of INDIA (Member OF IIPC)
+  </p>
+
+  <!-- Certificate No & Date - Single Row -->
+  <table class="w-full mb-4 text-sm">
+    <tbody>
+      <tr>
+        <td class="w-1/3 text-center"><strong>Certificate No: </strong>{{certificateNo}}</td>
+        <td class="w-1/3 text-center"><strong>Year: </strong>{{year}}</td>
+        <td class="w-1/3 text-center"><strong>Date: </strong> {{certificateDate}}</td>
+        
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Main Details Section -->
+  <div class="bordered-section mb-4">
+    <table class="w-full">
+      <!-- Row 1: Facility, Location & Code -->
+      <tr>
+        <td class="w-[30%] pr-2"><strong>Name of the facility:</strong><br>
+          Shree Jalaram Wood Works<br>
+          1060, At & Post Vankal<br>
+          Dharampur Road, Dist Valsad
+        </td>
+        <td class="w-[15%] px-2"><strong>Location: </strong>Valsad</td>
+        
+        <td class="w-[15%] px-2 text-center"><strong>Code No. IN-:</strong> 055<br><img src="{{htLogoPath}}" alt="HT Logo" width="100px" class="mt-1 h-[72px] w-auto mx-auto" /></td>
+      </tr>
+      
+      <!-- Row 2: Truck No, Date of Treatment -->
+      <tr>
+        <td><strong>Truck No:</strong> {{truckNo}}</td>
+        <td colspan="2"><strong>Date of Treatment:</strong>{{dateOfTreatment}}</td>
+      </tr>
+      
+      <!-- Row 3: Exporter & Consignment Details -->
+      <tr>
+        <td class="align-top">
+          <strong>Exporter Name & Address</strong><br><br>
+          {{customerName}}<br>
+          {{customerAddress}}
+        </td>
+        <td colspan="2" class="align-top">
+          <strong> Consignment/shipping particular</strong><br><br>
+          <strong>Container Number: </strong> -<br>
+          {{containerNumber}}<br><br>
+        
+          <strong>Batch Number:</strong><br>
+          {{batchNumber}}<br><br>
+        
+          <strong>SO-Number:</strong><br>
+          {{soNumber}}
+        </td>
+        
+        
+      </tr>
+    </table>
+
+    <!-- Material Description Table -->
+    <table class="w-full mt-4 text-sm mb-4">
+      <thead>
+        <tr>
+          <th class="w-3/5 text-left px-2 py-1">Description of Packing material treated</th>
+          <th class="w-1/5 text-left px-2 py-1">Qty Treated</th>
+          <th class="w-1/5 text-left px-2 py-1">Port / Country of Exports</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <!-- ==================== FIX IS HERE ==================== -->
+          <td class="px-2 py-1">
+            <!-- Start looping through the 'items' array -->
+            {{#each items}}
+            <div style="margin-bottom: 0.75rem;"> <!-- Added a div for spacing between items -->
+              <strong> {{this.material}}</strong><br>
+              {{this.code}}<br>
+              {{this.size}}
+            </div>
+            {{/each}}
+            <!-- End of the loop -->
+          </td>
+          <!-- ================= END OF FIX ==================== -->
+          <td class="px-2 py-1">{{qtyTreated}}</td>
+          <td class="px-2 py-1">{{country}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Treatment Time Details -->
+    <table class="w-full mb-4">
+      <tr>
+        <td class="w-1/2 px-2 py-1">
+          <strong>Attaining of Time of 56c Wood Core:</strong> -<br>
+          {{attainingTimeMins}} Minutes
+        </td>
+        <td class="w-1/2 px-2 py-1">
+          <strong>Total Treatment Time</strong><br>
+          {{totalTreatmentTimeMins}} Minutes
+        </td>
+      </tr>
+    </table>
+
+    <!-- Moisture Content Table -->
+    <table class="w-full mb-4">
+      <tr>
+        <td class="w-1/3 px-2 py-1"><strong>Moisture % of wood packing material</strong></td>
+        <td class="w-1/3 px-2 py-1"><strong>Before Treatment</strong><br>{{moistureBeforeTreatment}}%</td>
+        <td class="w-1/3 px-2 py-1"><strong>After Treatment</strong><br>{{moistureAfterTreatment}}%</td>
+      </tr>
+    </table>
+  </div>
+  <!-- Note Section in Box -->
+  <div class="mt-4">
+    <table class="w-full">
+      <tr>
+        <td class="px-2 py-1 text-xs"><strong>Note:</strong> {{note}}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Terms & Conditions and Signature Section -->
+  <div class="mt-4">
+    <table class="w-full">
+      <tr>
+        <td class="w-1/2 p-4 text-xs leading-snug align-top">
+          <p class="font-bold mb-2">TERMS & CONDITIONS: -</p>
+          <ol class="list-decimal list-inside space-y-2">
+            <li class="text-[9px]">
+              THIS CERTIFICATE IS VALID ONLY IF THE GOODS DESCRIBED ABOVE ARE SHIPPED WITHIN 90 DAYS FROM THE DATE OF HEAT TREATMENT.
+            </li>
+            <li class="text-[9px]">
+              THE HEAT TREATED WOODEN PALLETS ARE TO BE STORED IN A CLEAN, DRY AND COVERED WAREHOUSE/GODOWN.
+            </li>
+            <li class="text-[9px]">
+              NO LIABILITY ATTACHED TO OR IS ASSUMED BY THE CERTIFYING COMPANY IT'S DIRECTORS OR OF ITS REPRESENTATIVES IN RESPECT TO THIS CERTIFICATE
+            </li>
+          </ol>
+          
+          <p class="text-[9px] mt-4">
+            <strong>CONSIGNMENT DETAILS AS DECLARED BY SHIPPER.</strong>
+          </p>
+        </td>
+        
+        <td class="w-1/2 p-4 align-top">
+          <div class="flex flex-col justify-between h-full">
+            <div class="text-center">
+              <p class="text-sm">For, Shree Jalaram Wood Works</p>
+            </div>
+            
+            <div class="text-center mt-8">
+              <img src="{{signaturePath}}" alt="Signature" class="h-[64px] mx-auto mb-2 object-contain" />
+              <div class="border-t border-black inline-block pt-1 px-4 text-sm font-semibold">DHARMESH PATEL</div>
+              <p class="text-xs">(Authorized Operator)</p>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  </div>
+  </body></html>
