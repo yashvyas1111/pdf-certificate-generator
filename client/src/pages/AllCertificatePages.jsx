@@ -9,6 +9,7 @@ import {
 } from '../api/certificateApi';
 import { Search } from 'lucide-react';
 import { logout } from '../utils/auth';  // adjust path if needed
+import logo from '../assets/Logo.png'
 
 
 
