@@ -1,4 +1,4 @@
-// tailwind.config.js - THIS IS THE CORRECT CONTENT
+
 
 /** @type {import('tailwindcss').Config} */
 export default {

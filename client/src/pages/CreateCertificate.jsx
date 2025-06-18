@@ -27,11 +27,17 @@ const CertificatePage = () => {
 
   {/* Right: Logout Button */}
   <button
-    onClick={logout}
-    className="px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-900 text-white rounded-md shadow-md text-sm sm:text-base"
-  >
-    Logout
-  </button>
+  onClick={logout}
+  className="px-3 py-1 sm:px-4 sm:py-2 text-white rounded-md shadow-md text-sm sm:text-base"
+  style={{
+    backgroundColor: '#dc2626',
+    transition: 'background-color 0.2s ease'
+  }}
+  onMouseEnter={(e) => e.target.style.backgroundColor = '#b91c1c'}
+  onMouseLeave={(e) => e.target.style.backgroundColor = '#dc2626'}
+>
+  Logout
+</button>
 </div>
 
       <div
