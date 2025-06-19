@@ -26,11 +26,12 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   },
   year: {
     type: String,
+    default: () => new Date().getFullYear().toString(),
     trim: true
   },
+  
   certificateNoSuffix: {
     type: String,
-    required: true,
     trim: true
   },
   certificateDate: {
@@ -47,8 +48,8 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   },
   customerName: {
     type: String,
-    ref: 'Customer',
-    required: true
+    required: true,
+    trim: true,
   },
   customerAddress: {
     type: String,

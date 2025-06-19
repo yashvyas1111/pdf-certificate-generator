@@ -1,18 +1,21 @@
 import User from "../models/AuthorizedUser.js";
 
 export const loginWithEmail = async (req, res) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
 
-  if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+  if (!email || !password)
+    return res.status(400).json({ success: false, message: 'Email and password are required' });
 
   try {
     const user = await User.findOne({ email });
 
-    if (!user) {
+    if (!user)
       return res.status(404).json({ success: false, message: 'User not found' });
-    }
 
-    // Later you can add JWT token here
+    // Compare plain password directly (no hashing)
+    if (user.password !== password)
+      return res.status(401).json({ success: false, message: 'Invalid password' });
+
     return res.status(200).json({ success: true, message: 'Login successful', user });
 
   } catch (error) {

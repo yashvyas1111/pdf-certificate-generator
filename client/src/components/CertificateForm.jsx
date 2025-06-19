@@ -9,6 +9,7 @@ import {
 import { getCustomers, createCustomer } from '../api/customerApi';
 import { getItems, createItem, getItemByCode } from '../api/itemApi';
 import CreatableSelect from 'react-select/creatable';
+import { getNextCertificateSuffix } from '../api/certificateApi';
 
 const CertificateForm = () => {
   const { id } = useParams();
@@ -66,6 +67,13 @@ const CertificateForm = () => {
           }));
           while (rows.length < 2) rows.push({ code: '', material: '', size: '', id: null });
           setFormData({ ...cert, items: rows });
+        } else {
+          // 👇 Fetch the next available suffix only if creating
+          const { nextSuffix } = await getNextCertificateSuffix();
+          setFormData((prev) => ({
+            ...prev,
+            certificateNoSuffix: nextSuffix,
+          }));
         }
       } catch {
         setError('Failed to load form data');
@@ -81,17 +89,16 @@ const CertificateForm = () => {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleCustomerChange = async (opt) => {
+  const handleCustomerChange = (opt) => {
     const val = opt?.value || '';
-    let addr = '';
     const found = customers.find((c) => c.name === val);
-    if (found) addr = found.address;
-    if (!found && val) {
-      const created = await createCustomer({ name: val, address: '' });
-      setCustomers((c) => [...c, created]);
-    }
-    setFormData((p) => ({ ...p, customerName: val, customerAddress: addr }));
+    setFormData((p) => ({
+      ...p,
+      customerName: val,
+      customerAddress: found ? found.address : ''
+    }));
   };
+  
 
   const handleItemCodeChange = (idx) => async (opt) => {
     const code = opt?.value || '';
@@ -125,6 +132,26 @@ const CertificateForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // 1. Create customer if it doesn't exist
+      if (formData.customerName) {
+        const existingCustomer = customers.find(
+          (c) => c.name.toLowerCase() === formData.customerName.toLowerCase()
+        );
+        if (!existingCustomer) {
+          try {
+            const created = await createCustomer({
+              name: formData.customerName,
+              address: formData.customerAddress,
+            });
+            setCustomers((prev) => [...prev, created]);
+          } catch (err) {
+            alert('Failed to create new customer');
+            return; // stop form submission if customer creation fails
+          }
+        }
+      }
+  
+      // 2. Create or find items
       const itemsPayload = await Promise.all(
         formData.items
           .filter((r) => r.code)
@@ -137,18 +164,29 @@ const CertificateForm = () => {
             return { item: id, materialOverride: r.material, sizeOverride: r.size };
           })
       );
-
+  
+      // 3. Prepare payload with updated items array
       const payload = { ...formData, items: itemsPayload };
 
-      if (isEditing) await updateCertificate(id, payload);
-      else await createCertificate(payload);
-
+      if (!isEditing) {
+        delete payload.certificateNoSuffix;  // <-- delete suffix on create so backend generates it
+      }
+      
+  
+      // 4. Create or update certificate
+      if (isEditing) {
+        await updateCertificate(id, payload);
+      } else {
+        await createCertificate(payload);
+      }
+  
       alert(`Certificate ${isEditing ? 'updated' : 'created and PDF generated'} successfully!`);
       navigate('/certificates');
     } catch {
       alert(`Failed to ${isEditing ? 'update' : 'create'} certificate`);
     }
   };
+  
 
   if (loading) return <div className="p-6 text-center text-lg text-gray-600">Loading…</div>;
   if (error) return <div className="p-6 text-center text-lg text-red-500">{error}</div>;
@@ -178,19 +216,23 @@ const CertificateForm = () => {
 
 
    {/* Certificate No (Suffix) */}
-<div className="mb-6">
+   <div className="mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Certificate No (Suffix)
   </label>
   <input
     type="text"
     name="certificateNoSuffix"
-    value={formData.certificateNoSuffix}
-    onChange={handleChange}
-    placeholder="Enter Number(e.g. 001)"
-    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all"
+    value={formData.certificateNoSuffix || (!isEditing ? '001' : '')}
+    onChange={isEditing ? handleChange : undefined} // only editable if editing
+    placeholder={isEditing ? "Enter Number(e.g. 001)" : ""}
+    readOnly={!isEditing}  // read-only if creating
+    className={`w-full rounded-lg border border-gray-300 
+      ${!isEditing ? 'bg-gray-100 text-gray-600 cursor-not-allowed' : 'bg-white text-gray-800'}
+      px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all`}
   />
 </div>
+
 
 
 {/* Year */}

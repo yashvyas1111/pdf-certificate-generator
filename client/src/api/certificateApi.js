@@ -8,6 +8,12 @@ export const searchCertificates = async (query) => {
   return res.data;
 };
 
+export const getNextCertificateSuffix = async () => {
+  const res = await axios.get('/api/certificates/next-suffix');
+  return res.data;
+};
+
+
 export const createCertificate = async (data) => {
   const res = await axios.post('/api/certificates', data);
   return res.data;

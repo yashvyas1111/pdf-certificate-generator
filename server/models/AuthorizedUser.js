@@ -6,7 +6,16 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  name: String, // Optional
-}, { timestamps: true });
+  // Remove the 'name' field if it's here
+  password: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    default: 'user',
+  },
+});
 
-export default mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+export default User;

@@ -63,6 +63,7 @@ export const createCertificate = async (req, res) => {
 
     /* 2. Save certificate ------------------------------------------ */
     const certData = { ...req.body, items };
+    delete certData.certificateNoSuffix;
     const newCert = new Certificate(certData);
     await newCert.save();
 
@@ -177,7 +178,7 @@ export const searchCertificates = async (req, res) => {
         }
       },
 
-      // 🔥 Merge item info into each entry in items[]
+      // Merge item info into each entry in items[]
       {
         $addFields: {
           items: {
@@ -474,5 +475,35 @@ export const sendCertificateEmail = async (req, res) => {
     res
       .status(500)
       .json({ message: 'Failed to send email', error: err.message });
+  }
+};
+
+
+/* ------------------------------------------------------------------ */
+/* Get next certificate suffix                                 */
+/* ------------------------------------------------------------------ */
+export const getNextCertificateSuffix = async (req, res) => {
+  try {
+    const currentYear = new Date().getFullYear().toString();
+
+    const lastCert = await Certificate.findOne({ year: currentYear })
+      .sort({ certificateNoSuffix: -1 })
+      .lean();
+
+    let nextSuffixNumber = 1;
+
+    if (lastCert && lastCert.certificateNoSuffix) {
+      const lastNumber = parseInt(lastCert.certificateNoSuffix, 10);
+      if (!isNaN(lastNumber)) {
+        nextSuffixNumber = lastNumber + 1;
+      }
+    }
+
+    const nextSuffix = nextSuffixNumber.toString().padStart(3, '0');
+
+    res.json({ nextSuffix });
+  } catch (err) {
+    console.error('Error fetching next certificate suffix:', err);
+    res.status(500).json({ message: 'Failed to get next suffix', error: err.message });
   }
 };
