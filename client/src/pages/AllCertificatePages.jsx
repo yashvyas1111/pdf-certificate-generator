@@ -29,7 +29,12 @@ const AllCertificates = () => {
     try {
       setLoading(true);
       const data = await getAllCertificates();
-      setCertificates(data);
+    if (Array.isArray(data)) {
+       setCertificates(data);
+    } else {
+  console.error('Expected an array but got:', data);
+  setCertificates([]); // fallback to empty array
+}
     } catch (err) {
       console.error('Error fetching certificates:', err);
       setError('Failed to load certificates. Please try again.');
@@ -200,7 +205,7 @@ const AllCertificates = () => {
             </tr>
           </thead>
           <tbody className="divide-y  divide-slate-200">
-            {certificates.length > 0 ? (
+            {Array.isArray(certificates) && certificates.length > 0 ?  (
               certificates.map((cert, index) => (
                 <tr
                   key={cert._id}
