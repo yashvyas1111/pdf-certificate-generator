@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CertificateForm from '../components/CertificateForm';
 import { logout } from '../utils/auth';
 import logo from '../assets/Logo.png';
+
 
 const CertificatePage = () => {
   return (
