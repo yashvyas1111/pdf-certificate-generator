@@ -9,6 +9,7 @@ import {
 } from '../api/certificateApi';
 import { Search } from 'lucide-react';
 import { logout } from '../utils/auth';  // adjust path if needed
+import {BASE_URL} from '../api/axios';
 
 
 
@@ -104,10 +105,11 @@ const AllCertificates = () => {
 };
 
 
-  const handleViewPdf = (id, includeHeader = true) => {
-    const url = `/api/certificates/${id}/pdf?header=${includeHeader}`;
-    window.open(url, '_blank');
-  };
+const handleViewPdf = (id, includeHeader = true) => {
+  const url = `${BASE_URL}/api/certificates/${id}/pdf?header=${includeHeader}`;
+  window.open(url, '_blank');
+};
+
 
   if (loading) {
     return (
@@ -268,14 +270,15 @@ const AllCertificates = () => {
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <a
-                        href={`/api/certificates/${cert._id}/pdf`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 hover:text-indigo-900 shadow-sm transition"
-                      >
-                        PDF
-                      </a>
+                    <a
+                href={`${BASE_URL}/api/certificates/${cert._id}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 hover:text-indigo-900 shadow-sm transition"
+              >
+                PDF
+            </a>
+
                       <button
                         onClick={() => openEmailModal(cert)}
                         className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 hover:text-blue-900 shadow-sm transition"
