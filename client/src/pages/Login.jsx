@@ -5,9 +5,12 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const[loading,setLoading] = useState(false);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await axios.post(
@@ -24,6 +27,8 @@ const Login = () => {
       }
     } catch (err) {
       setMessage(err.response?.data?.message || 'Server error');
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -62,11 +67,15 @@ const Login = () => {
           required
         />
 
-        <button
+      <button
           type="submit"
-          className="w-full bg-indigo-600 hover:bg-indigo-900 text-white font-semibold py-3 rounded-xl shadow-lg transition duration-300"
+          className="w-full bg-indigo-600 hover:bg-indigo-900 text-white font-semibold py-3 rounded-xl shadow-lg transition duration-300 flex justify-center"
         >
-          Login
+          {loading ? (
+            <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+          ) : (
+            'Login'
+          )}
         </button>
 
         {message && (
