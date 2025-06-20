@@ -55,7 +55,7 @@ const base64Signature = `data:image/png;base64,${signBuffer.toString('base64')}`
   console.log('Using Chromium executable at:', puppeteer.executablePath());
 
   const browser = await puppeteer.launch({
-    headless:"new",
+    headless: true,
     executablePath: puppeteer.executablePath(),
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
