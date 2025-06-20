@@ -9,7 +9,7 @@ import {
 } from '../api/certificateApi';
 import { Search } from 'lucide-react';
 import { logout } from '../utils/auth';  // adjust path if needed
-import {BASE_URL} from '../api/axios';
+import { BASE_URL } from '../api/axios';
 
 
 

@@ -7,3 +7,4 @@ const axiosInstance = axios.create({
 });
 
 export default axiosInstance;
+export { BASE_URL }; 
