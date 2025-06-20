@@ -55,7 +55,7 @@ const base64Signature = `data:image/png;base64,${signBuffer.toString('base64')}`
 
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: puppeteer.executablePath(), // 🔥 This fixes the Render error
+    executablePath:'/opt/render/.cache/puppeteer/chrome/linux-137.0.7151.55/chrome-linux64/chrome',  
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
   
