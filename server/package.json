@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-
-    "postinstall": "puppeteer browsers install chrome"
-  },
+  "start": "node index.js",
+  "postinstall": "puppeteer browsers install chrome && node ./node_modules/puppeteer/install.mjs"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
