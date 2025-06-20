@@ -53,7 +53,12 @@ const base64Signature = `data:image/png;base64,${signBuffer.toString('base64')}`
 
   const html = handlebars.compile(htmlTemplate)(processed);
 
-  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: puppeteer.executablePath(), // 🔥 This fixes the Render error
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+  
   const page     = await browser.newPage();
   await page.setContent(html, { waitUntil: 'networkidle0' });
 
