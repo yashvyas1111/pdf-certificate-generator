@@ -52,10 +52,11 @@ const base64Signature = `data:image/png;base64,${signBuffer.toString('base64')}`
   const htmlTemplate = await fs.readFile(templatePath, 'utf-8');
 
   const html = handlebars.compile(htmlTemplate)(processed);
+  console.log('Using Chromium executable at:', puppeteer.executablePath());
 
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath:'/opt/render/.cache/puppeteer/chrome/linux-137.0.7151.55/chrome-linux64/chrome',  
+    executablePath: puppeteer.executablePath(), 
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
   
