@@ -2,8 +2,11 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 // Core packages
 import express from 'express';
+console.log("✅ CPU Architecture:", process.arch);
+
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
