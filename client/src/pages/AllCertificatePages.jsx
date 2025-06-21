@@ -181,7 +181,18 @@ const handleViewPdf = (id, includeHeader = true) => {
       + New Certificate
     </Link>
   </div>
-
+  <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white shadow-lg mb-6">
+  <div className="flex items-center justify-between">
+    <div>
+      <h2 className="text-lg font-medium opacity-90">Total Certificates</h2>
+      <p className="text-3xl font-bold">{certificates.length}</p>
+    </div>
+    <div className="bg-white/20 rounded-full p-3">
+      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
+      </svg>
+    </div>
+  </div></div>
       <div className="overflow-x-auto bg-white rounded-lg shadow">
         <table className="min-w-full divide-y divide-slate-200">
           <thead className="bg-indigo-600 ">

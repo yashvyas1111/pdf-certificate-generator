@@ -14,9 +14,9 @@ function getFinancialYear(date = new Date()) {
   const month = date.getMonth();
   
   if (month >= 3) { // April onwards
-    return year;
+    return `${year} - ${year+1}`;
   } else { // January to March
-    return year - 1;
+    return `${year}-${year-1}`;
   }
 }
 

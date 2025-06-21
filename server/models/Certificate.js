@@ -9,9 +9,9 @@ function getFinancialYear(date = new Date()) {
   // If month is April (3) or later, financial year starts from current year (eg.certificate no 001)
   
   if (month >= 3) { // April onwards (3 = April, 4 = May, etc.)
-    return year;
+    return `${year} - ${year+1}`; 
   } else { // January to March
-    return year - 1;
+    return `${year}-${year-1}`;
   }
 }
 
