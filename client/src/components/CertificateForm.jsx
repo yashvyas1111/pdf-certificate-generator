@@ -45,6 +45,8 @@ const CertificateForm = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,6 +133,7 @@ const CertificateForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true)
     try {
       // 1. Create customer if it doesn't exist
       if (formData.customerName) {
@@ -147,6 +150,8 @@ const CertificateForm = () => {
           } catch (err) {
             alert('Failed to create new customer');
             return; // stop form submission if customer creation fails
+          }finally{
+            setSubmitting(false)
           }
         }
       }
@@ -559,12 +564,45 @@ const CertificateForm = () => {
     Cancel
   </button>
   <button
-    type="submit"
-    disabled={loading}
-    className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-3 font-semibold text-white shadow-lg hover:from-blue-700 hover:to-blue-900 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    {isEditing ? 'Update Certificate' : 'Generate PDF'}
-  </button>
+  type="submit"
+  disabled={loading || submitting}
+  className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-800
+             px-6 py-3 font-semibold text-white shadow-lg
+             hover:from-blue-700 hover:to-blue-900 transition
+             duration-300 ease-in-out focus:outline-none
+             focus:ring-4 focus:ring-blue-300
+             disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {submitting ? (
+    <span className="flex items-center justify-center">
+      {/* simple Tailwind spinner */}
+      <svg
+        className="animate-spin h-5 w-5 mr-2 text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+      Generating…
+    </span>
+  ) : (
+    isEditing ? "Update Certificate" : "Generate PDF"
+  )}
+</button>
+
 </div>
 <div>
       {/* Your form JSX */}
