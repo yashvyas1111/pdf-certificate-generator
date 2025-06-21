@@ -79,7 +79,7 @@ export const createCertificate = async (req, res) => {
         };
       }),
     );
-    const certificateNo = `${newCert.certificateNoPrefix}/${newCert.year}/${newCert.certificateNoSuffix}`;
+    const certificateNo = `${newCert.certificateNoPrefix}/${newCert.certificateNoSuffix}`;
 
     /* 4. Generate PDF buffer --------------------------------------- */
     await generateCertificatePdf({
@@ -326,7 +326,7 @@ export const downloadCertificatePdf = async (req, res) => {
       }),
     );
 
-    const certificateNo = `${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`;
+    const certificateNo = `${cert.certificateNoPrefix}/${cert.certificateNoSuffix}`;
     const pdfBuffer = await generateCertificatePdf({
       certificateNo,
       certificateDate: formatDate(cert.certificateDate),
@@ -378,7 +378,7 @@ export const previewCertificate = async (req, res) => {
       }),
     );
 
-    const certificateNo = `${data.certificateNoPrefix}/${data.year}/${
+    const certificateNo = `${data.certificateNoPrefix}/${
       data.certificateNoSuffix || 'PREVIEW'
     }`;
 
@@ -430,7 +430,7 @@ export const sendCertificateEmail = async (req, res) => {
       }),
     );
 
-    const certificateNo = `${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`;
+    const certificateNo = `${cert.certificateNoPrefix}/${cert.certificateNoSuffix}`;
 
     const pdfBuffer = await generateCertificatePdf({
       certificateNo,
