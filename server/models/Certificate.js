@@ -40,7 +40,6 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   },
   year: {
     type: String,
-    default: () => getFinancialYear().toString(),
     trim: true
   },
   
@@ -124,7 +123,7 @@ heatTreatmentCertificateSchema.pre('save', async function (next) {
     const doc = this;
     const CertificateModel = this.constructor;
 
-    if (!doc.year) {
+    
       if (
         doc.certificateDate instanceof Date && //if year not find then get year from the certificate date
         !isNaN(doc.certificateDate)
@@ -137,7 +136,7 @@ heatTreatmentCertificateSchema.pre('save', async function (next) {
           )
         );
       }
-    }
+    
 
     try {
       const lastCertificate = await CertificateModel
