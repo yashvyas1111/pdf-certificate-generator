@@ -332,15 +332,15 @@ const handleViewPdf = (id, includeHeader = true) => {
 
       
       {isEmailModalOpen && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-    <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-white/90 p-8 shadow-2xl backdrop-blur-md">
-      <h2 className="mb-4 text-center text-xl font-bold text-indigo-900">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+    <div className="w-full max-w-md rounded-xl border border-gray-300 bg-white p-6 shadow-lg md:rounded-2xl md:border-gray-700 md:bg-white/90 md:p-8 md:backdrop-blur-md">
+      <h2 className="mb-3 text-lg font-bold text-indigo-900 md:mb-4 md:text-center md:text-xl">
         Send Certificate Email
       </h2>
 
-      <p className="mb-4 text-center text-sm text-gray-700">
-        Sending certificate:&nbsp;
-        <span className="font-mono font-semibold text-gray-900">
+      <p className="mb-3 text-sm text-gray-700 md:mb-4 md:text-center">
+        Sending certificate:{" "}
+        <span className="font-semibold text-gray-900">
           {selectedCertificate?.certificateNoPrefix}/
           {selectedCertificate?.year}/
           {selectedCertificate?.certificateNoSuffix}
@@ -350,13 +350,13 @@ const handleViewPdf = (id, includeHeader = true) => {
       <input
         type="email"
         placeholder="Enter recipient email"
-        className="mb-4 w-full rounded-lg border border-gray-300 p-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+        className="mb-4 w-full rounded-lg border border-gray-300 p-2.5 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 md:p-3"
         value={emailToSend}
         onChange={(e) => setEmailToSend(e.target.value)}
         disabled={isSending}
       />
 
-      <div className="mt-2 flex justify-center gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:justify-center sm:gap-3">
         <button
           onClick={closeEmailModal}
           disabled={isSending}
@@ -375,7 +375,7 @@ const handleViewPdf = (id, includeHeader = true) => {
       </div>
 
       {isSending && (
-        <p className="mt-4 text-center text-sm text-yellow-600 animate-pulse">
+        <p className="mt-3 text-center text-sm text-yellow-600 animate-pulse md:mt-4">
           Please wait, email is being sent…
         </p>
       )}
