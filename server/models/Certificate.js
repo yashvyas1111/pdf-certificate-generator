@@ -1,3 +1,4 @@
+// models/HeatTreatmentCertificate.js
 import mongoose from 'mongoose';
 
 const itemEntrySchema = new mongoose.Schema({
@@ -17,7 +18,6 @@ const itemEntrySchema = new mongoose.Schema({
 });
 
 const heatTreatmentCertificateSchema = new mongoose.Schema({
-  // 📦 Certificate Numbering
   certificateNoPrefix: {
     type: String,
     default: 'SJWI',
@@ -25,27 +25,33 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
     enum: ['SJWI']
   },
   year: {
-    type: String, // visible year in number like "2025"
+    type: String,
     default: () => new Date().getFullYear().toString(),
     trim: true
   },
+  
   certificateNoSuffix: {
-    type: String, // auto-incremented like "001", "002"
+    type: String,
     trim: true
   },
-
-  // 📆 Date Fields
   certificateDate: {
     type: Date,
     required: true
+  },
+  truckNo: {
+    type: String,
+    trim: true
   },
   dateOfTreatment: {
     type: Date,
     required: true
   },
-
-  // 🚚 Shipment Details
-  truckNo: {
+  customerName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  customerAddress: {
     type: String,
     trim: true
   },
@@ -62,21 +68,9 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
     trim: true
   },
 
-  // 🧾 Customer Info
-  customerName: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  customerAddress: {
-    type: String,
-    trim: true
-  },
-
-  // 📋 Items
+  // ⬇️ NEW way to handle item/material/size
   items: [itemEntrySchema],
 
-  // 📊 Treatment Details
   qtyTreated: {
     type: String,
     trim: true
@@ -100,56 +94,63 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   note: {
     type: String,
     trim: true
-  },
-
-  // 🆕 New fields for April-based cycle logic
-  cycleYear: {
-    type: Number,
-    required: true
-  },
-  serialNumber: {
-    type: Number,
-    required: true
   }
+}, {
+  timestamps: true
+});
 
-}, { timestamps: true });
-
-
-// ✅ Unique index on cycle + serial
+// ✅ Certificate Number Auto-Generation
 heatTreatmentCertificateSchema.index(
-  { certificateNoPrefix: 1, cycleYear: 1, serialNumber: 1 },
+  { certificateNoPrefix: 1, year: 1, certificateNoSuffix: 1 },
   { unique: true }
 );
 
-
-// ✅ Auto-generate suffix & handle fiscal-year reset
 heatTreatmentCertificateSchema.pre('save', async function (next) {
-  if (!this.isNew || this.certificateNoSuffix) {
-    return next();
+  if (this.isNew && !this.certificateNoSuffix) {
+    const doc = this;
+    const CertificateModel = this.constructor;
+
+    if (!doc.year) {
+      if (
+        doc.certificateDate instanceof Date &&
+        !isNaN(doc.certificateDate)
+      ) {
+        doc.year = doc.certificateDate.getFullYear().toString();
+      } else {
+        return next(
+          new Error(
+            'Year is required to generate certificate suffix, and could not be derived from certificateDate.'
+          )
+        );
+      }
+    }
+
+    try {
+      const lastCertificate = await CertificateModel
+        .findOne({
+          certificateNoPrefix: doc.certificateNoPrefix,
+          year: doc.year
+        })
+        .sort({ createdAt: -1 });
+
+      let nextSuffixNumber = 1;
+      if (lastCertificate && lastCertificate.certificateNoSuffix) {
+        const lastSuffixAsInt = parseInt(lastCertificate.certificateNoSuffix, 10);
+        if (!isNaN(lastSuffixAsInt)) {
+          nextSuffixNumber = lastSuffixAsInt + 1;
+        }
+      }
+
+      doc.certificateNoSuffix = nextSuffixNumber.toString().padStart(3, '0');
+      next();
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    next();
   }
-
-  const Certificate = this.constructor;
-  const today = this.certificateDate || new Date();
-
-  const currentYear = today.getFullYear();
-  const aprilFirst = new Date(currentYear, 3, 1); // April = 3 (0-indexed)
-  const cycleYear = today < aprilFirst ? currentYear - 1 : currentYear;
-
-  const lastCert = await Certificate
-    .findOne({ certificateNoPrefix: this.certificateNoPrefix, cycleYear })
-    .sort({ serialNumber: -1 })
-    .select('serialNumber')
-    .lean();
-
-  const nextSerial = lastCert ? lastCert.serialNumber + 1 : 1;
-
-  this.cycleYear = cycleYear;
-  this.serialNumber = nextSerial;
-  this.certificateNoSuffix = String(nextSerial).padStart(3, '0');
-  this.year = currentYear.toString();
-
-  next();
 });
 
 const Certificate = mongoose.model('HeatTreatmentCertificate', heatTreatmentCertificateSchema);
+
 export default Certificate;
