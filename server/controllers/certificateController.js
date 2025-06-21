@@ -9,6 +9,17 @@ import Customer from '../models/Customer.js';
 import Item from '../models/Item.js';
 import { generateCertificatePdf } from '../utils/generatePdf.js';
 
+function getFinancialYear(date = new Date()) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  
+  if (month >= 3) { // April onwards
+    return year;
+  } else { // January to March
+    return year - 1;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /*  EMAIL (Gmail App‑Password) TRANSPORTER ‑ reused across functions  */
 /* ------------------------------------------------------------------ */
@@ -484,9 +495,9 @@ export const sendCertificateEmail = async (req, res) => {
 /* ------------------------------------------------------------------ */
 export const getNextCertificateSuffix = async (req, res) => {
   try {
-    const currentYear = new Date().getFullYear().toString();
+    const currentFinancialYear = getFinancialYear().toString();
 
-    const lastCert = await Certificate.findOne({ year: currentYear })
+    const lastCert = await Certificate.findOne({ year: currentFinancialYear })
       .sort({ certificateNoSuffix: -1 })
       .lean();
 

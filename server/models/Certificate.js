@@ -1,6 +1,20 @@
 // models/HeatTreatmentCertificate.js
 import mongoose from 'mongoose';
 
+
+function getFinancialYear(date = new Date()) {
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-based (0 = January, 3 = April)
+  
+  // If month is April (3) or later, financial year starts from current year (eg.certificate no 001)
+  
+  if (month >= 3) { // April onwards (3 = April, 4 = May, etc.)
+    return year;
+  } else { // January to March
+    return year - 1;
+  }
+}
+
 const itemEntrySchema = new mongoose.Schema({
   item: {
     type: mongoose.Schema.Types.ObjectId,
@@ -26,7 +40,7 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   },
   year: {
     type: String,
-    default: () => new Date().getFullYear().toString(),
+    default: () => getFinancialYear().toString(),
     trim: true
   },
   
@@ -112,10 +126,10 @@ heatTreatmentCertificateSchema.pre('save', async function (next) {
 
     if (!doc.year) {
       if (
-        doc.certificateDate instanceof Date &&
+        doc.certificateDate instanceof Date && //if year not find then get year from the certificate date
         !isNaN(doc.certificateDate)
       ) {
-        doc.year = doc.certificateDate.getFullYear().toString();
+        doc.year = getFinancialYear(doc.certificateDate).toString();
       } else {
         return next(
           new Error(
@@ -131,7 +145,7 @@ heatTreatmentCertificateSchema.pre('save', async function (next) {
           certificateNoPrefix: doc.certificateNoPrefix,
           year: doc.year
         })
-        .sort({ createdAt: -1 });
+        .sort({ certificateNoSuffix: -1 });
 
       let nextSuffixNumber = 1;
       if (lastCertificate && lastCertificate.certificateNoSuffix) {
