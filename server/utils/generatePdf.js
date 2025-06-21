@@ -77,13 +77,17 @@ export const generateCertificatePdf = async certificateData => {
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
     /* ----- render PDF --------------------------------------- */
-    const pdfBuffer = await page.pdf({
-      width: '233mm',
-      height: '333mm',
-      margin: { bottom: '20px', right: '50px' },
-      printBackground: true,
-    });
-
+    
+const pdfBuffer = await page.pdf({
+  format: 'A4',               // single‑sheet A4
+  printBackground: true,
+  margin: {                   // symmetric printable area
+    top: '12mm',
+    right: '12mm',
+    bottom: '12mm',
+    left: '12mm'
+  }
+});
     await browser.close();
     return pdfBuffer;
   } catch (err) {
