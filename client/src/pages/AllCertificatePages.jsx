@@ -12,6 +12,25 @@ import { logout } from '../utils/auth';  // adjust path if needed
 import { BASE_URL } from '../api/axios';
 
 
+function getFinancialYear(dateString) {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-based Jan=0, Feb=1, ...
+
+  // FY starts from April (month 3)
+  if (month >= 3) {
+    // e.g. Apr 2025 → FY 2025-26
+    return `${year}-${(year + 1).toString().slice(-2)}`;
+  } else {
+    // e.g. Jan 2026 → FY 2025-26
+    return `${year - 1}-${year.toString().slice(-2)}`;
+  }
+}
+
+
+
 
 
 const AllCertificates = () => {
@@ -229,7 +248,9 @@ const handleViewPdf = (id, includeHeader = true) => {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                    {`${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`}
+                  {`${cert.certificateNoPrefix}/${getFinancialYear(cert.certificateDate)}/${cert.certificateNoSuffix}`}
+
+
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
@@ -352,9 +373,10 @@ const handleViewPdf = (id, includeHeader = true) => {
       <p className="mb-3 text-sm text-gray-700 md:mb-4 md:text-center">
         Sending certificate:{" "}
         <span className="font-semibold text-gray-900">
-          {selectedCertificate?.certificateNoPrefix}/
-          {selectedCertificate?.year}/
-          {selectedCertificate?.certificateNoSuffix}
+        {selectedCertificate?.certificateNoPrefix}/
+{new Date(selectedCertificate?.certificateDate).getFullYear()}/
+{selectedCertificate?.certificateNoSuffix}
+
         </span>
       </p>
 
@@ -368,6 +390,15 @@ const handleViewPdf = (id, includeHeader = true) => {
       />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-center sm:gap-3">
+
+      <button
+          onClick={handleSendEmail}
+          disabled={isSending}
+          className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
+        >
+          {isSending ? 'Sending…' : 'Send'}
+        </button>
+
         <button
           onClick={closeEmailModal}
           disabled={isSending}
@@ -376,13 +407,7 @@ const handleViewPdf = (id, includeHeader = true) => {
           Cancel
         </button>
 
-        <button
-          onClick={handleSendEmail}
-          disabled={isSending}
-          className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
-        >
-          {isSending ? 'Sending…' : 'Send'}
-        </button>
+       
       </div>
 
       {isSending && (

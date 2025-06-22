@@ -9,7 +9,7 @@ import Customer from '../models/Customer.js';
 import Item from '../models/Item.js';
 import { generateCertificatePdf } from '../utils/generatePdf.js';
 
-function getFinancialYear(date = new Date()) {
+export function fyStart(date = new Date()) {
   const year = date.getFullYear();
   const month = date.getMonth();
   
@@ -18,6 +18,12 @@ function getFinancialYear(date = new Date()) {
   } else { // January to March
     return year - 1;
   }
+}
+
+export function fyRange(date=new Date()) {
+  const start = fyStart(date)
+  const end= (start+1).toString().slice(-2);
+  return `${start}-${end}`
 }
 
 /* ------------------------------------------------------------------ */
@@ -72,8 +78,16 @@ export const createCertificate = async (req, res) => {
       }),
     );
 
+       /* 2. Prepare certificate data */
+    // Ensure year and financialYear fields are set correctly:
+    const dateForFY = req.body.certificateDate ? new Date(req.body.certificateDate) : new Date();
+    const financialYearStart = fyStart(dateForFY); // Number like 2025
+    const financialYearRange = fyRange(dateForFY); // String like "2025-26"
+
     /* 2. Save certificate ------------------------------------------ */
-    const certData = { ...req.body, items };
+    const certData = { ...req.body, items, year: financialYearRange,       // FY string like "2025-26"
+      financialYear: financialYearStart, // FY number like 2025 (for suffix query)
+    };
     delete certData.certificateNoSuffix;
     const newCert = new Certificate(certData);
     await newCert.save();
@@ -90,7 +104,7 @@ export const createCertificate = async (req, res) => {
         };
       }),
     );
-    const certificateNo = `${newCert.certificateNoPrefix}/${newCert.certificateNoSuffix}`;
+    const certificateNo = `${newCert.certificateNoPrefix}/${newCert.year}/${newCert.certificateNoSuffix}`;
 
     /* 4. Generate PDF buffer --------------------------------------- */
     await generateCertificatePdf({
@@ -337,7 +351,8 @@ export const downloadCertificatePdf = async (req, res) => {
       }),
     );
 
-    const certificateNo = `${cert.certificateNoPrefix}/${cert.certificateNoSuffix}`;
+    const certificateNo = `${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`;
+
     const pdfBuffer = await generateCertificatePdf({
       certificateNo,
       certificateDate: formatDate(cert.certificateDate),
@@ -441,7 +456,8 @@ export const sendCertificateEmail = async (req, res) => {
       }),
     );
 
-    const certificateNo = `${cert.certificateNoPrefix}/${cert.certificateNoSuffix}`;
+    const certificateNo = `${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`;
+
 
     const pdfBuffer = await generateCertificatePdf({
       certificateNo,
@@ -495,9 +511,8 @@ export const sendCertificateEmail = async (req, res) => {
 /* ------------------------------------------------------------------ */
 export const getNextCertificateSuffix = async (req, res) => {
   try {
-    const currentFinancialYear = getFinancialYear().toString();
-
-    const lastCert = await Certificate.findOne({ year: currentFinancialYear })
+    const currentFYStart = fyStart(); // e.g. 2025
+    const lastCert = await Certificate.findOne({ financialYear: currentFYStart })
       .sort({ certificateNoSuffix: -1 })
       .lean();
 

@@ -40,12 +40,20 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   },
   year: {
     type: String,
-    trim: true
+    trim: true,
+    required:true
+  },
+  
+  financialYear: {
+    type: Number,
+    required: true,
+    index: true,
   },
   
   certificateNoSuffix: {
     type: String,
-    trim: true
+    trim: true,
+    required: true,
   },
   certificateDate: {
     type: Date,
@@ -114,7 +122,7 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
 
 // ✅ Certificate Number Auto-Generation
 heatTreatmentCertificateSchema.index(
-  { certificateNoPrefix: 1, year: 1, certificateNoSuffix: 1 },
+  { certificateNoPrefix: 1, financialYear: 1, certificateNoSuffix: 1 },
   { unique: true }
 );
 
@@ -128,7 +136,9 @@ heatTreatmentCertificateSchema.pre('save', async function (next) {
         doc.certificateDate instanceof Date && //if year not find then get year from the certificate date
         !isNaN(doc.certificateDate)
       ) {
-        doc.year = getFinancialYear(doc.certificateDate).toString();
+        const fyStartYear = getFinancialYear(doc.certificateDate);
+        doc.financialYear = fyStartYear;
+        doc.year = `${fyStartYear}-${(fyStartYear + 1).toString().slice(-2)}`;
       } else {
         return next(
           new Error(
@@ -142,7 +152,7 @@ heatTreatmentCertificateSchema.pre('save', async function (next) {
       const lastCertificate = await CertificateModel
         .findOne({
           certificateNoPrefix: doc.certificateNoPrefix,
-          year: doc.year
+          financialYear: doc.financialYear,
         })
         .sort({ certificateNoSuffix: -1 });
 

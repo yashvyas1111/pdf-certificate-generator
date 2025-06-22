@@ -11,6 +11,20 @@ import { getItems, createItem, getItemByCode } from '../api/itemApi';
 import CreatableSelect from 'react-select/creatable';
 import { getNextCertificateSuffix } from '../api/certificateApi';
 
+// ────────────────────────────────────────────────────────────────
+// Financial-year helpers for frontend preview and suffix reload
+function fyStart(date = new Date()) {
+  const y = date.getFullYear();
+  const m = date.getMonth();           // 0-based
+  return m >= 3 ? y : y - 1;
+}
+function fyRange(date = new Date()) {
+  const start = fyStart(date);
+  return `${start}-${(start + 1).toString().slice(-2)}`;
+}
+// ────────────────────────────────────────────────────────────────
+
+
 const CertificateForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -19,7 +33,6 @@ const CertificateForm = () => {
   const initialFormState = {
     certificateNoSuffix: '',
     certificateDate: '',
-    year: new Date().getFullYear().toString(),
     customerName: '',
     customerAddress: '',
     items: [
@@ -69,13 +82,7 @@ const CertificateForm = () => {
           }));
           while (rows.length < 2) rows.push({ code: '', material: '', size: '', id: null });
           setFormData({ ...cert, items: rows });
-        } else {
-          // 👇 Fetch the next available suffix only if creating
-          const { nextSuffix } = await getNextCertificateSuffix();
-          setFormData((prev) => ({
-            ...prev,
-            certificateNoSuffix: nextSuffix,
-          }));
+       
         }
       } catch {
         setError('Failed to load form data');
@@ -86,8 +93,29 @@ const CertificateForm = () => {
     fetchData();
   }, [id, isEditing]);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
+
+    /* When user picks certificateDate (create mode) => fetch suffix */
+    if (name === 'certificateDate' && !isEditing) {
+
+      if (!value) {
+        // date cleared ⇒ clear suffix + FY preview
+        setFormData((p) => ({ ...p, certificateDate: '', certificateNoSuffix: '' }));
+        return;
+      }
+    
+      setFormData((p) => ({ ...p, certificateDate: value }));
+
+      try {
+        const { nextSuffix } = await getNextCertificateSuffix();
+        setFormData((p) => ({ ...p, certificateNoSuffix: nextSuffix }));
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
@@ -239,21 +267,20 @@ const CertificateForm = () => {
 </div>
 
 
-
-{/* Year */}
-<div className="mb-6">
-  <label className="block text-sm font-semibold text-gray-700 mb-2">
-    Year
-  </label>
-  <input
-    type="text"
-    name="year"
-    value={formData.year}
-    onChange={handleChange}
-    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all"
-  />
-</div>
-
+  {/* FY range preview */}
+  {formData.certificateDate && (
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+               Year
+            </label>
+            <input
+              type="text"
+              readOnly
+              value={fyRange(new Date(formData.certificateDate))}
+              className="w-full rounded-lg border bg-gray-100 px-4 py-2 text-gray-600 cursor-not-allowed"
+            />
+          </div>
+        )}
 
 {/* Date of Treatment */}
 <div className="mb-6">
@@ -265,6 +292,7 @@ const CertificateForm = () => {
     name="dateOfTreatment"
     value={formData.dateOfTreatment}
     onChange={handleChange}
+    required
     className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all"
   />
 </div>
