@@ -33,6 +33,7 @@ const CertificateForm = () => {
   const initialFormState = {
     certificateNoSuffix: '',
     certificateDate: '',
+    
     customerName: '',
     customerAddress: '',
     items: [
@@ -108,7 +109,8 @@ const CertificateForm = () => {
       setFormData((p) => ({ ...p, certificateDate: value }));
 
       try {
-        const { nextSuffix } = await getNextCertificateSuffix({ date: value });
+        console.log('Fetching with date param:', value);
+        const { nextSuffix } = await getNextCertificateSuffix({value});
 
         console.log('Fetched suffix →', nextSuffix);// pass the picked date
         setFormData((p) => ({ ...p, certificateNoSuffix: nextSuffix }));

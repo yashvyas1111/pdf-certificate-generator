@@ -120,57 +120,55 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// ✅ Certificate Number Auto-Generation
+/// Index remains unchanged — ensures unique combination of prefix, FY, and suffix
 heatTreatmentCertificateSchema.index(
   { certificateNoPrefix: 1, financialYear: 1, certificateNoSuffix: 1 },
   { unique: true }
 );
 
 heatTreatmentCertificateSchema.pre('save', async function (next) {
-  if (this.isNew && !this.certificateNoSuffix) {
-    const doc = this;
-    const CertificateModel = this.constructor;
+  // Only generate suffix if this is a new doc AND suffix not already set
+  if (!this.isNew || this.certificateNoSuffix) {
+    return next();
+  }
 
-    
-      if (
-        doc.certificateDate instanceof Date && //if year not find then get year from the certificate date
-        !isNaN(doc.certificateDate)
-      ) {
-        const fyStartYear = getFinancialYear(doc.certificateDate);
-        doc.financialYear = fyStartYear;
-        doc.year = `${fyStartYear}-${(fyStartYear + 1).toString().slice(-2)}`;
-      } else {
-        return next(
-          new Error(
-            'Year is required to generate certificate suffix, and could not be derived from certificateDate.'
-          )
-        );
-      }
-    
-
-    try {
-      const lastCertificate = await CertificateModel
-        .findOne({
-          certificateNoPrefix: doc.certificateNoPrefix,
-          financialYear: doc.financialYear,
-        })
-        .sort({ certificateNoSuffix: -1 });
-
-      let nextSuffixNumber = 1;
-      if (lastCertificate && lastCertificate.certificateNoSuffix) {
-        const lastSuffixAsInt = parseInt(lastCertificate.certificateNoSuffix, 10);
-        if (!isNaN(lastSuffixAsInt)) {
-          nextSuffixNumber = lastSuffixAsInt + 1;
-        }
-      }
-
-      doc.certificateNoSuffix = nextSuffixNumber.toString().padStart(3, '0');
-      next();
-    } catch (error) {
-      next(error);
+  try {
+    // Validate certificateDate properly
+    if (!(this.certificateDate instanceof Date) || isNaN(this.certificateDate)) {
+      return next(
+        new Error('Valid certificateDate is required to generate suffix')
+      );
     }
-  } else {
+
+    // Calculate financialYear and display year string
+    const fyStartYear = getFinancialYear(this.certificateDate);
+    this.financialYear = fyStartYear;
+    this.year = `${fyStartYear}-${(fyStartYear + 1).toString().slice(-2)}`;
+
+    // Find last certificate with same prefix and financialYear
+    const lastCertificate = await this.constructor
+      .findOne({
+        certificateNoPrefix: this.certificateNoPrefix,
+        financialYear: this.financialYear,
+      })
+      .sort({ certificateNoSuffix: -1 })
+      .lean();
+
+    // Calculate next suffix number
+    let nextSuffixNumber = 1;
+    if (lastCertificate?.certificateNoSuffix) {
+      const lastSuffixInt = parseInt(lastCertificate.certificateNoSuffix, 10);
+      if (!isNaN(lastSuffixInt)) {
+        nextSuffixNumber = lastSuffixInt + 1;
+      }
+    }
+
+    // Assign suffix padded with leading zeros to length 3 (e.g. 001)
+    this.certificateNoSuffix = nextSuffixNumber.toString().padStart(3, '0');
+
     next();
+  } catch (error) {
+    next(error);
   }
 });
 

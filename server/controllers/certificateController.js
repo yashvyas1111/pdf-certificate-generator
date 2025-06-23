@@ -4,7 +4,7 @@
 
 import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
-import Certificate from '../models/Certificate.js';
+import Certificate from '../models/Certificate.js'
 import Customer from '../models/Customer.js';
 import Item from '../models/Item.js';
 import { generateCertificatePdf } from '../utils/generatePdf.js';
