@@ -508,28 +508,40 @@ export const sendCertificateEmail = async (req, res) => {
 /* ------------------------------------------------------------------ */
 /* Get next certificate suffix                                 */
 /* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+/* Get next certificate suffix                                         */
+/* ------------------------------------------------------------------ */
 export const getNextCertificateSuffix = async (req, res) => {
   try {
+    // 1️⃣  Parse reference date (today if none supplied)
     const refDate = req.query.date ? new Date(req.query.date) : new Date();
-    const currentFYStart = fyStart(refDate); 
-    const lastCert = await Certificate.findOne({ financialYear: currentFYStart })
-      .sort({ certificateNoSuffix: -1 })
+    const fyStartYear = fyStart(refDate);   // e.g. 2025
+
+    // 2️⃣  If no certificate exists for this FY, start from 001
+    const count = await Certificate.countDocuments({ financialYear: fyStartYear });
+    if (count === 0) {
+      return res.json({ nextSuffix: '001' });
+    }
+
+    // 3️⃣  Otherwise, find the last suffix and increment it
+    const lastCert = await Certificate
+      .findOne({ financialYear: fyStartYear })
+      .sort({ certificateNoSuffix: -1 })     // highest suffix first
       .lean();
 
     let nextSuffixNumber = 1;
-
-    if (lastCert && lastCert.certificateNoSuffix) {
-      const lastNumber = parseInt(lastCert.certificateNoSuffix, 10);
-      if (!isNaN(lastNumber)) {
-        nextSuffixNumber = lastNumber + 1;
-      }
+    if (lastCert?.certificateNoSuffix) {
+      const lastNum = parseInt(lastCert.certificateNoSuffix, 10);
+      if (!isNaN(lastNum)) nextSuffixNumber = lastNum + 1;
     }
 
     const nextSuffix = nextSuffixNumber.toString().padStart(3, '0');
-
     res.json({ nextSuffix });
   } catch (err) {
     console.error('Error fetching next certificate suffix:', err);
-    res.status(500).json({ message: 'Failed to get next suffix', error: err.message });
+    res
+      .status(500)
+      .json({ message: 'Failed to get next suffix', error: err.message });
   }
 };
