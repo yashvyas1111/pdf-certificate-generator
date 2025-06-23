@@ -227,7 +227,7 @@ const CertificateForm = () => {
   if (error) return <div className="p-6 text-center text-lg text-red-500">{error}</div>;
 
   return (
-    <div className="max-w-7xl bg mx-auto p-8 bg-yellow-200  rounded-3xl shadow-xl">
+    <div className="max-w-7xl bg mx-auto p-4 sm:p-8 bg-yellow-200 rounded-3xl shadow-xl">
       <h2 className="text-2xl font-semibold font-serif mb-8 text-gray-800 text-center">
         {isEditing ? 'Edit Certificate' : 'Create New Certificate'}
       </h2>
@@ -236,7 +236,7 @@ const CertificateForm = () => {
       <form onSubmit={handleSubmit} className="grid gap-6 sm:grid-cols-2">
 
         {/* Certificate Date */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Certificate Date
   </label>
@@ -251,7 +251,7 @@ const CertificateForm = () => {
 
 
    {/* Certificate No (Suffix) */}
-   <div className="mb-6">
+   <div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Certificate No (Suffix)
   </label>
@@ -272,7 +272,7 @@ const CertificateForm = () => {
 
   {/* FY range preview */}
   {formData.certificateDate && (
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
                Year
             </label>
@@ -286,7 +286,7 @@ const CertificateForm = () => {
         )}
 
 {/* Date of Treatment */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Date of Treatment
   </label>
@@ -302,7 +302,7 @@ const CertificateForm = () => {
 
 
 {/* Truck Number */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Truck Number
   </label>
@@ -316,7 +316,7 @@ const CertificateForm = () => {
 </div>
 
 {/* Customer Name (CreatableSelect) */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Company Name
   </label>
@@ -371,7 +371,7 @@ const CertificateForm = () => {
 
 
 {/* Batch Number */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Batch Number
   </label>
@@ -385,7 +385,7 @@ const CertificateForm = () => {
 </div>
 
 {/* SO Number */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     SO Number
   </label>
@@ -457,7 +457,7 @@ const CertificateForm = () => {
 ))}
 
 {/* Quantity Treated */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Quantity Treated
   </label>
@@ -476,7 +476,7 @@ const CertificateForm = () => {
 
 
 {/* Container Number */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Container Number
   </label>
@@ -490,7 +490,7 @@ const CertificateForm = () => {
 </div>
 
 {/* Country */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Country
   </label>
@@ -505,7 +505,7 @@ const CertificateForm = () => {
 
 
 {/* Attaining Time (mins) */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Attaining Time (mins)
   </label>
@@ -535,7 +535,7 @@ const CertificateForm = () => {
 </div>
 
 {/* Moisture Before Treatment (%) */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
      Before Treatment (%)
   </label>
@@ -552,7 +552,7 @@ const CertificateForm = () => {
 </div>
 
 {/* Moisture After Treatment (%) */}
-<div className="mb-6">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     After Treatment (%)
   </label>
@@ -586,7 +586,7 @@ const CertificateForm = () => {
 
 
 {/* Submit Buttons */}
-<div className="sm:col-span-2 flex justify-start gap-6 mt-8">
+<div className="sm:col-span-2 flex flex-col sm:flex-row gap-4 sm:gap-6 mt-8">
   <button
     type="button"
     onClick={() => navigate('/certificates')}
