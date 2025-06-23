@@ -110,7 +110,8 @@ const CertificateForm = () => {
 
       try {
         console.log('Fetching with date param:', value);
-        const { nextSuffix } = await getNextCertificateSuffix({value});
+        const { nextSuffix } = await getNextCertificateSuffix(value);
+
 
         console.log('Fetched suffix →', nextSuffix);// pass the picked date
         setFormData((p) => ({ ...p, certificateNoSuffix: nextSuffix }));
