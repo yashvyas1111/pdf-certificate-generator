@@ -206,10 +206,7 @@ const CertificateForm = () => {
       // 3. Prepare payload with updated items array
       const payload = { ...formData, items: itemsPayload };
 
-      if (!isEditing) {
-        delete payload.certificateNoSuffix;  // <-- delete suffix on create so backend generates it
-      }
-      
+   
   
       // 4. Create or update certificate
       if (isEditing) {
