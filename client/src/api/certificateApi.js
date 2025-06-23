@@ -7,8 +7,10 @@ export const searchCertificates = async (query) => {
   return res.data;
 };
 
-export const getNextCertificateSuffix = async () => {
-  const res = await axiosInstance.get('/api/certificates/next-suffix');
+export const getNextCertificateSuffix = async (date) => {
+  const res = await axiosInstance.get('/api/certificates/next-suffix', {
+    params: { date }   // <-- pass date as query param
+  });
   return res.data;
 };
 

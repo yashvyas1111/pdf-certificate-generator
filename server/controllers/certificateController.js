@@ -104,7 +104,7 @@ export const createCertificate = async (req, res) => {
         };
       }),
     );
-    const certificateNo = `${newCert.certificateNoPrefix}/${newCert.year}/${newCert.certificateNoSuffix}`;
+    const certificateNo = `${newCert.certificateNoPrefix}/${newCert.certificateNoSuffix}`;
 
     /* 4. Generate PDF buffer --------------------------------------- */
     await generateCertificatePdf({
@@ -351,7 +351,7 @@ export const downloadCertificatePdf = async (req, res) => {
       }),
     );
 
-    const certificateNo = `${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`;
+    const certificateNo = `${cert.certificateNoPrefix}/${cert.certificateNoSuffix}`;
 
     const pdfBuffer = await generateCertificatePdf({
       certificateNo,
@@ -511,7 +511,8 @@ export const sendCertificateEmail = async (req, res) => {
 /* ------------------------------------------------------------------ */
 export const getNextCertificateSuffix = async (req, res) => {
   try {
-    const currentFYStart = fyStart(); // e.g. 2025
+    const refDate = req.query.date ? new Date(req.query.date) : new Date();
+    const currentFYStart = fyStart(refDate); 
     const lastCert = await Certificate.findOne({ financialYear: currentFYStart })
       .sort({ certificateNoSuffix: -1 })
       .lean();

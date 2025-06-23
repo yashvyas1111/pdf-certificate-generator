@@ -108,7 +108,9 @@ const CertificateForm = () => {
       setFormData((p) => ({ ...p, certificateDate: value }));
 
       try {
-        const { nextSuffix } = await getNextCertificateSuffix(value); // pass the picked date
+        const { nextSuffix } = await getNextCertificateSuffix({ date: value });
+
+        console.log('Fetched suffix →', nextSuffix);// pass the picked date
         setFormData((p) => ({ ...p, certificateNoSuffix: nextSuffix }));
       } catch {
         /* ignore */
@@ -254,16 +256,17 @@ const CertificateForm = () => {
     Certificate No (Suffix)
   </label>
   <input
-    type="text"
-    name="certificateNoSuffix"
-    value={formData.certificateNoSuffix || (!isEditing ? '001' : '')}
-    onChange={isEditing ? handleChange : undefined} // only editable if editing
-    placeholder={isEditing ? "Enter Number(e.g. 001)" : ""}
-    readOnly={!isEditing}  // read-only if creating
-    className={`w-full rounded-lg border border-gray-300 
-      ${!isEditing ? 'bg-gray-100 text-gray-600 cursor-not-allowed' : 'bg-white text-gray-800'}
-      px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all`}
-  />
+  type="text"
+  name="certificateNoSuffix"
+  value={formData.certificateNoSuffix}   // use value directly, no fallback
+  onChange={isEditing ? handleChange : undefined} // editable only when editing
+  placeholder={!isEditing ? "001" : ""}  // show placeholder hint only on create
+  readOnly={!isEditing}  // read-only if creating new certificate
+  className={`w-full rounded-lg border border-gray-300
+    ${!isEditing ? 'bg-gray-100 text-gray-600 cursor-not-allowed' : 'bg-white text-gray-800'}
+    px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all`}
+/>
+
 </div>
 
 
