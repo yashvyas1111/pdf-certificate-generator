@@ -108,7 +108,7 @@ const CertificateForm = () => {
       setFormData((p) => ({ ...p, certificateDate: value }));
 
       try {
-        const { nextSuffix } = await getNextCertificateSuffix();
+        const { nextSuffix } = await getNextCertificateSuffix(value); // pass the picked date
         setFormData((p) => ({ ...p, certificateNoSuffix: nextSuffix }));
       } catch {
         /* ignore */
