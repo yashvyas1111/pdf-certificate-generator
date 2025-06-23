@@ -88,7 +88,7 @@ export const createCertificate = async (req, res) => {
     const certData = { ...req.body, items, year: financialYearRange,       // FY string like "2025-26"
       financialYear: financialYearStart, // FY number like 2025 (for suffix query)
     };
-    delete certData.certificateNoSuffix;
+    // delete certData.certificateNoSuffix;
     const newCert = new Certificate(certData);
     await newCert.save();
 
@@ -136,9 +136,8 @@ export const createCertificate = async (req, res) => {
       certificate: newCert,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: 'Certificate creation failed', error: err.message });
+    console.error('❌ Certificate creation error:', err); 
+    res.status(500).json({ message: 'Certificate creation failed', error: err.message });
   }
 };
 
