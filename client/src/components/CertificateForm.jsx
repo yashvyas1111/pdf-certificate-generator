@@ -592,7 +592,7 @@ const CertificateForm = () => {
     onClick={() => navigate('/certificates')}
     className="rounded-lg bg-gray-400 px-6 py-3 font-semibold text-white shadow-md hover:bg-gray-500 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-gray-300"
   >
-    Cancell
+    Cancel
   </button>
   <button
   type="submit"
