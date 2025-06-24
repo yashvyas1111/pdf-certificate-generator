@@ -92,10 +92,16 @@ const heatTreatmentCertificateSchema = new mongoose.Schema({
   // ⬇️ NEW way to handle item/material/size
   items: [itemEntrySchema],
 
-  qtyTreated: {
+  qtyTreated1: {
     type: String,
     trim: true
   },
+
+  qtyTreated2: {
+    type: String,
+    trim: true
+  },
+
   country: {
     type: String,
     trim: true
