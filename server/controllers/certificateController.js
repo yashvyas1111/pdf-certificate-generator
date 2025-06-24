@@ -524,8 +524,10 @@ export const getNextCertificateSuffix = async (req, res) => {
     // 2️⃣  If no certificate exists for this FY, start from 001
     const count = await Certificate.countDocuments({ financialYear: fyStartYear });
     if (count === 0) {
-      return res.json({ nextSuffix: '001' });
+      const firstSuffix = fyStartYear === 2025 ? 229 : 1;
+      return res.json({ nextSuffix: firstSuffix.toString().padStart(3, '0') });
     }
+    
 
     // 3️⃣  Otherwise, find the last suffix and increment it
     const lastCert = await Certificate
