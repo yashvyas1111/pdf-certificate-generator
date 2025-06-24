@@ -524,7 +524,7 @@ export const getNextCertificateSuffix = async (req, res) => {
     // 2️⃣  If no certificate exists for this FY, start from 001
     const count = await Certificate.countDocuments({ financialYear: fyStartYear });
     if (count === 0) {
-      const firstSuffix = fyStartYear === 2025 ? 229 : 1;
+      const firstSuffix = fyStartYear === 2025 ? 230 : 1;
       return res.json({ nextSuffix: firstSuffix.toString().padStart(3, '0') });
     }
     
