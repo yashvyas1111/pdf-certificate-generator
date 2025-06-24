@@ -463,7 +463,7 @@ const CertificateForm = () => {
     Quantity Treated 1
   </label>
   <input
-    type="number"
+    type="text"
     name="qtyTreated1"
     value={formData.qtyTreated1}
     onChange={handleChange}
@@ -478,12 +478,12 @@ const CertificateForm = () => {
     Quantity Treated 2
   </label>
   <input
-    type="number"
+    type="text"
     name="qtyTreated2"
     value={formData.qtyTreated2}
     onChange={handleChange}
     min="0"
-    required
+    
     className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all"
   />
 </div>
