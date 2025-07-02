@@ -378,7 +378,7 @@ export const downloadCertificatePdf = async (req, res) => {
 
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${certificateNo}.pdf"`,
+      'Content-Disposition': `inline; filename="${certificateNo}.pdf"`,
     });
     res.send(pdfBuffer);
   } catch (err) {
