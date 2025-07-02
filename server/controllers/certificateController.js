@@ -550,3 +550,48 @@ export const getNextCertificateSuffix = async (req, res) => {
       .json({ message: 'Failed to get next suffix', error: err.message });
   }
 };
+/* ------------------------------------------------------------------ */
+/* Get the most‑recent certificate ‑ for form pre‑fill                */
+/* ------------------------------------------------------------------ */
+export const getLatestCertificate = async (_req, res) => {
+  try {
+    const latest = await Certificate
+      .findOne()
+      .sort({ createdAt: -1 })
+      .populate('items.item', 'code material size') // we need code!
+      .lean();
+
+    if (!latest) return res.json(null);             // first run
+
+    /* ---------- Strip / reset fields that must be regenerated ---- */
+    delete latest._id;
+    delete latest.certificateDate;
+    delete latest.certificateNoSuffix;
+    delete latest.createdAt;
+    delete latest.updatedAt;
+
+    // Blank values the operator should always re‑enter
+    latest.qtyTreated1 = '';
+    latest.qtyTreated2 = '';
+    latest.note         = '';
+    latest.dateOfTreatment = '';
+    // If you added heatTimes: latest.heatTimes = [{ attain:'', total:'' }];
+
+    /* ---------- Re‑shape items for frontend ---------------------- */
+    const rows = (latest.items || []).map((row) => ({
+      code:  row.item?.code       || '',
+      material: row.materialOverride || row.item?.material || '',
+      size:     row.sizeOverride     || row.item?.size     || '',
+      id:   row.item?._id || null,
+    }));
+
+    while (rows.length < 2) rows.push({ code:'', material:'', size:'', id:null });
+
+    latest.items = rows;
+
+    return res.json(latest);
+  } catch (err) {
+    console.error('Latest‑certificate fetch error:', err);
+    res.status(500).json({ message: 'Failed to fetch latest certificate' });
+  }
+};

@@ -9,13 +9,15 @@ import {
   previewCertificate,
   sendCertificateEmail,
   searchCertificates,
-  getNextCertificateSuffix
+  getNextCertificateSuffix,
+  getLatestCertificate
 } from '../controllers/certificateController.js';
 
 const router = express.Router();
 
 router.get('/search', searchCertificates);     // ✅ put search route first
 router.get('/next-suffix', getNextCertificateSuffix);  // add this route here
+router.get('/latest', getLatestCertificate); 
 
 router.get('/', getAllCertificates);
 router.post('/', createCertificate);
