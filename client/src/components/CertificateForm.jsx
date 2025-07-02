@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import {
   createCertificate,
   updateCertificate,
-  getCertificateById
+  getCertificateById,
+  getLatestCertificate,
 } from '../api/certificateApi';
 import { getCustomers, createCustomer } from '../api/customerApi';
 import { getItems, createItem, getItemByCode } from '../api/itemApi';
@@ -85,6 +86,19 @@ const CertificateForm = () => {
           while (rows.length < 2) rows.push({ code: '', material: '', size: '', id: null });
           setFormData({ ...cert, items: rows });
        
+        }else{
+          const latest = await getLatestCertificate()
+          if(latest){
+            const rows = (latest.items || []).map((r) => ({
+              code:r.code,
+              material:r.material,
+              size:r.size,
+              id: r.id || null,
+            }));
+
+          while (rows.length < 2) rows.push({ code:'', material:'', size:'', id:null });
+          setFormData((p) => ({ ...p, ...latest, items: rows }));
+          }
         }
       } catch {
         setError('Failed to load form data');
@@ -483,6 +497,7 @@ const CertificateForm = () => {
     value={formData.qtyTreated2}
     onChange={handleChange}
     min="0"
+
     
     className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all"
   />
@@ -526,7 +541,7 @@ const CertificateForm = () => {
     Attaining Time (mins)
   </label>
   <input
-    type="number"
+    type="text"
     name="attainingTimeMins"
     value={formData.attainingTimeMins}
     onChange={handleChange}
@@ -536,12 +551,12 @@ const CertificateForm = () => {
 </div>
 
 {/* Total Treatment Time (mins) */}
-<div className="mb-6 sm:col-span-2">
+<div className="mb-4 sm:mb-6">
   <label className="block text-sm font-semibold text-gray-700 mb-2">
     Total Treatment Time (mins)
   </label>
   <input
-    type="number"
+    type="text"
     name="totalTreatmentTimeMins"
     value={formData.totalTreatmentTimeMins}
     onChange={handleChange}

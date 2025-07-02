@@ -1,5 +1,11 @@
 import axiosInstance from "./axios";
 
+
+export const getLatestCertificate = async () => {
+  const res = await axiosInstance.get('/api/certificates/latest');
+  return res.data;                   // null if none exist
+};
+
 export const searchCertificates = async (query) => {
   const res = await axiosInstance.get('/api/certificates/search', {
     params: { query },
