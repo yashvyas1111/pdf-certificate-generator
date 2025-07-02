@@ -77,6 +77,9 @@ const CertificateForm = () => {
 
         if (isEditing) {
           const cert = await getCertificateById(id);
+
+          const certDate = cert.certificateDate ? cert.certificateDate.slice(0,10) : '';
+          const treatDate = cert.dateOfTreatment ? cert.dateOfTreatment.slice(0,10) : '';
           const rows = cert.items.map((it) => ({
             code: it.item.code,
             material: it.materialOverride || it.item.material,
@@ -84,7 +87,10 @@ const CertificateForm = () => {
             id: it.item._id
           }));
           while (rows.length < 2) rows.push({ code: '', material: '', size: '', id: null });
-          setFormData({ ...cert, items: rows });
+          setFormData({ ...cert,
+            certificateDate: certDate,
+              dateOfTreatment: treatDate, 
+              items: rows });
        
         }else{
           const latest = await getLatestCertificate()
