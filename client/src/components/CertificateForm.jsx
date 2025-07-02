@@ -95,6 +95,9 @@ const CertificateForm = () => {
         }else{
           const latest = await getLatestCertificate()
           if(latest){
+
+             latest.certificateDate = latest.certificateDate?.slice(0, 10) || '';
+             latest.dateOfTreatment = latest.dateOfTreatment?.slice(0, 10) || '';
             const rows = (latest.items || []).map((r) => ({
               code:r.code,
               material:r.material,
