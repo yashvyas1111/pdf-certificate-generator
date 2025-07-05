@@ -578,17 +578,17 @@ export const getLatestCertificate = async (_req, res) => {
     // If you added heatTimes: latest.heatTimes = [{ attain:'', total:'' }];
 
     /* ---------- Re‑shape items for frontend ---------------------- */
-    const rows = (latest.items || []).map((row) => ({
-      code:  row.item?.code       || '',
-      material: row.materialOverride || row.item?.material || '',
-      size:     row.sizeOverride     || row.item?.size     || '',
-      id:   row.item?._id || null,
-    }));
+    // const rows = (latest.items || []).map((row) => ({
+    //   code:  row.item?.code       || '',
+    //   material: row.materialOverride || row.item?.material || '',
+    //   size:     row.sizeOverride     || row.item?.size     || '',
+    //   id:   row.item?._id || null,
+    // }));
 
-    while (rows.length < 2) rows.push({ code:'', material:'', size:'', id:null });
+    // while (rows.length < 2) rows.push({ code:'', material:'', size:'', id:null });
 
-    latest.items = rows;
-
+    // latest.items = rows;
+    latest.items = [{ code: '', material: '', size: '', id: null }];
     return res.json(latest);
   } catch (err) {
     console.error('Latest‑certificate fetch error:', err);
