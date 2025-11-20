@@ -491,13 +491,13 @@ export const previewCertificate = async (req, res) => {
 //       to: email,
 //       subject: `Heat Treatment Certificate – ${certificateNo}`,
 //       text: `Dear ${customerName},\n\nPlease find attached your Heat Treatment Certificate (${certificateNo}).\n\nRegards,\nShree Jalaram Pallets`,
-//       attachments: [
-//         {
-//           filename: `${certificateNo}.pdf`,
-//           content: pdfBuffer,
-//           contentType: 'application/pdf',
-//         },
-//       ],
+      // attachments: [
+      //   {
+      //     filename: `${certificateNo}.pdf`,
+      //     content: pdfBuffer,
+      //     contentType: 'application/pdf',
+      //   },
+      // ],
 //     };
 
 //     await transporter.sendMail(mailOptions);
@@ -579,14 +579,13 @@ export const sendCertificateEmail = async (req, res) => {
         <p>Please find attached your Heat Treatment Certificate.</p>
         <p>Thank you,<br>Shree Jalaram Pallets Team</p>
       `,
-      attachments: [
-  {
-    filename: `${certificateNo}.pdf`,
-    content: pdfBuffer.toString('base64'),
-    type: 'application/pdf',
-    disposition: 'attachment',
-  },
-],
+    attachments: [
+        {
+          filename: `${certificateNo}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf',
+        },
+      ],
     });
 
     // Optionally save the sent info in the DB
