@@ -580,11 +580,13 @@ export const sendCertificateEmail = async (req, res) => {
         <p>Thank you,<br>Shree Jalaram Pallets Team</p>
       `,
       attachments: [
-        {
-          filename: `${certificateNo}.pdf`,
-          content: pdfBuffer.toString('base64'),
-        },
-      ],
+  {
+    filename: `${certificateNo}.pdf`,
+    content: pdfBuffer.toString('base64'),
+    type: 'application/pdf',
+    disposition: 'attachment',
+  },
+],
     });
 
     // Optionally save the sent info in the DB
