@@ -568,7 +568,16 @@ export const sendCertificateEmail = async (req, res) => {
     });
 
     // Send email via Resend
- await resend.emails.send({
+const pdfBase64 = Buffer.from(pdfBuffer)
+  .toString('base64')
+  .replace(/\n/g, '')        // remove any line breaks
+  .replace(/\r/g, '');  
+
+// ✅ Test: save the file locally
+fs.writeFileSync('verify.pdf', Buffer.from(pdfBase64, 'base64'));
+console.log('✅ verify.pdf saved successfully — open it manually to confirm.');
+
+await resend.emails.send({
   from: 'Shree Jalaram Pallets <info@jalarampallets.com>',
   to: email,
   bcc: 'yvyas9646@gmail.com',
@@ -582,12 +591,14 @@ export const sendCertificateEmail = async (req, res) => {
   attachments: [
     {
       filename: `${certificateNo}.pdf`,
-      content: pdfBuffer.toString('base64'),   // ✅ base64 encoded
-      type: 'application/pdf',                 // ✅ MIME type
-      disposition: 'attachment',               // ✅ ensures Gmail handles it right
+      content: pdfBase64,               // ✅ Clean base64 string
+      type: 'application/pdf',          // ✅ Correct MIME type
+      disposition: 'attachment',        // ✅ Forces proper download
+      contentTransferEncoding: 'base64' // ✅ Explicitly declare encoding
     },
   ],
 });
+
 
 
 
