@@ -25,6 +25,7 @@
     "nodemailer": "^7.0.3",
     "path": "^0.12.7",
     "puppeteer-core": "^24.10.2",
+    "resend": "^6.5.2",
     "twilio": "^5.7.1"
   }
 }

@@ -3,12 +3,15 @@
 /* ------------------------------------------------------------------ */
 
 import mongoose from 'mongoose';
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
 import Certificate from '../models/Certificate.js'
 import Customer from '../models/Customer.js';
 import Item from '../models/Item.js';
 import { generateCertificatePdf } from '../utils/generatePdf.js';
-
+import { Resend } from 'resend';
+import fs from 'fs';
+import path from 'path';
+const resend = new Resend(process.env.RESEND_API_KEY);
 export function fyStart(date = new Date()) {
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -29,13 +32,13 @@ export function fyRange(date=new Date()) {
 /* ------------------------------------------------------------------ */
 /*  EMAIL (Gmail App‑Password) TRANSPORTER ‑ reused across functions  */
 /* ------------------------------------------------------------------ */
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,      // e.g. yourbusiness@gmail.com
-    pass: process.env.EMAIL_APP_PASS,  // 16‑char Gmail App Password
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
+//     user: process.env.EMAIL_USER,      // e.g. yourbusiness@gmail.com
+//     pass: process.env.EMAIL_APP_PASS,  // 16‑char Gmail App Password
+//   },
+// });
 
 /* Helper – format date as "11 June 2025" */
 const formatDate = (date) =>
@@ -432,18 +435,99 @@ export const previewCertificate = async (req, res) => {
 /* ------------------------------------------------------------------ */
 /* NEW – Send PDF to any email address                                */
 /* ------------------------------------------------------------------ */
+// export const sendCertificateEmail = async (req, res) => {
+//   const { id } = req.params;
+//   const { email,includeHeader = true} = req.body;
+
+//   if (!email) return res.status(400).json({ message: 'Email is required' });
+
+
+//   try {
+//     const cert = await Certificate.findById(id);
+//     if (!cert) return res.status(404).json({ message: 'Certificate not found' });
+
+//     const { customerName } = cert;  
+
+//     const customer = await Customer.findOne({ name: cert.customerName }).lean();
+//     const populatedItems = await Promise.all(
+//       cert.items.map(async (entry) => {
+//         const item = await Item.findById(entry.item).lean();
+//         return {
+//           code: item?.code || '',
+//           material: entry.materialOverride || item?.material || '',
+//           size: entry.sizeOverride || item?.size || '',
+//         };
+//       }),
+//     );
+
+//     const certificateNo = `${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`;
+
+
+//     const pdfBuffer = await generateCertificatePdf({
+//       certificateNo,
+//       certificateDate: formatDate(cert.certificateDate),
+//       year: cert.year,
+//       customerName: cert.customerName,
+//       customerAddress: customer?.address || cert.customerAddress,
+//       items: populatedItems,
+//       qtyTreated1: cert.qtyTreated1,
+//       qtyTreated2: cert.qtyTreated2,
+//       truckNo: cert.truckNo,
+//       batchNumber: cert.batchNumber,
+//       soNumber: cert.soNumber,
+//       containerNumber: cert.containerNumber,
+//       country: cert.country,
+//       note: cert.note,
+//       dateOfTreatment: formatDate(cert.dateOfTreatment),
+//       attainingTimeMins: cert.attainingTimeMins,
+//       totalTreatmentTimeMins: cert.totalTreatmentTimeMins,
+//       moistureBeforeTreatment: cert.moistureBeforeTreatment,
+//       moistureAfterTreatment: cert.moistureAfterTreatment,
+//       includeHeader,
+//     });
+
+//     const mailOptions = {
+//       from: process.env.EMAIL_USER,
+//       to: email,
+//       subject: `Heat Treatment Certificate – ${certificateNo}`,
+//       text: `Dear ${customerName},\n\nPlease find attached your Heat Treatment Certificate (${certificateNo}).\n\nRegards,\nShree Jalaram Pallets`,
+//       attachments: [
+//         {
+//           filename: `${certificateNo}.pdf`,
+//           content: pdfBuffer,
+//           contentType: 'application/pdf',
+//         },
+//       ],
+//     };
+
+//     await transporter.sendMail(mailOptions);
+//     res.json({ success: true, message: `Certificate sent to ${email}` });
+//   } catch (err) {
+//     console.error('Email send error:', err);
+//     res
+//       .status(500)
+//       .json({ message: 'Failed to send email', error: err.message });
+//   }
+// };
+
+
+/* ------------------------------------------------------------------ */
+/* Get next certificate suffix                                 */
+/* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+/* Get next certificate suffix                                         */
+/* ------------------------------------------------------------------ */
+
 export const sendCertificateEmail = async (req, res) => {
   const { id } = req.params;
-  const { email,includeHeader = true} = req.body;
+  const { email, includeHeader = true } = req.body;
 
   if (!email) return res.status(400).json({ message: 'Email is required' });
-
 
   try {
     const cert = await Certificate.findById(id);
     if (!cert) return res.status(404).json({ message: 'Certificate not found' });
-
-    const { customerName } = cert;  
 
     const customer = await Customer.findOne({ name: cert.customerName }).lean();
     const populatedItems = await Promise.all(
@@ -459,10 +543,10 @@ export const sendCertificateEmail = async (req, res) => {
 
     const certificateNo = `${cert.certificateNoPrefix}/${cert.year}/${cert.certificateNoSuffix}`;
 
-
+    // Generate the PDF buffer
     const pdfBuffer = await generateCertificatePdf({
       certificateNo,
-      certificateDate: formatDate(cert.certificateDate),
+      certificateDate: new Date(cert.certificateDate).toLocaleDateString('en-GB'),
       year: cert.year,
       customerName: cert.customerName,
       customerAddress: customer?.address || cert.customerAddress,
@@ -475,7 +559,7 @@ export const sendCertificateEmail = async (req, res) => {
       containerNumber: cert.containerNumber,
       country: cert.country,
       note: cert.note,
-      dateOfTreatment: formatDate(cert.dateOfTreatment),
+      dateOfTreatment: new Date(cert.dateOfTreatment).toLocaleDateString('en-GB'),
       attainingTimeMins: cert.attainingTimeMins,
       totalTreatmentTimeMins: cert.totalTreatmentTimeMins,
       moistureBeforeTreatment: cert.moistureBeforeTreatment,
@@ -483,38 +567,37 @@ export const sendCertificateEmail = async (req, res) => {
       includeHeader,
     });
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    // Send email via Resend
+    await resend.emails.send({
+      from: 'Shree Jalaram Pallets <info@jalarampallets.com>',
       to: email,
+      bcc: 'yvyas9646@gmail.com',          // optional: keep a copy in your Gmail
+      reply_to: 'yvyas9646@gmail.com',     // so customer replies come to you
       subject: `Heat Treatment Certificate – ${certificateNo}`,
-      text: `Dear ${customerName},\n\nPlease find attached your Heat Treatment Certificate (${certificateNo}).\n\nRegards,\nShree Jalaram Pallets`,
+      html: `
+        <p>Dear <b>${cert.customerName}</b>,</p>
+        <p>Please find attached your Heat Treatment Certificate.</p>
+        <p>Thank you,<br>Shree Jalaram Pallets Team</p>
+      `,
       attachments: [
         {
           filename: `${certificateNo}.pdf`,
-          content: pdfBuffer,
-          contentType: 'application/pdf',
+          content: pdfBuffer.toString('base64'),
         },
       ],
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true, message: `Certificate sent to ${email}` });
+    // Optionally save the sent info in the DB
+    cert.lastEmailSent = { to: email, sentAt: new Date() };
+    await cert.save();
+
+    res.json({ success: true, message: `✅ Certificate sent to ${email}` });
   } catch (err) {
     console.error('Email send error:', err);
-    res
-      .status(500)
-      .json({ message: 'Failed to send email', error: err.message });
+    res.status(500).json({ message: 'Failed to send email', error: err.message });
   }
 };
 
-
-/* ------------------------------------------------------------------ */
-/* Get next certificate suffix                                 */
-/* ------------------------------------------------------------------ */
-
-/* ------------------------------------------------------------------ */
-/* Get next certificate suffix                                         */
-/* ------------------------------------------------------------------ */
 export const getNextCertificateSuffix = async (req, res) => {
   try {
     // 1️⃣  Parse reference date (today if none supplied)
