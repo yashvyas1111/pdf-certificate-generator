@@ -568,25 +568,28 @@ export const sendCertificateEmail = async (req, res) => {
     });
 
     // Send email via Resend
-    await resend.emails.send({
-      from: 'Shree Jalaram Pallets <info@jalarampallets.com>',
-      to: email,
-      bcc: 'yvyas9646@gmail.com',          // optional: keep a copy in your Gmail
-      reply_to: 'yvyas9646@gmail.com',     // so customer replies come to you
-      subject: `Heat Treatment Certificate – ${certificateNo}`,
-      html: `
-        <p>Dear <b>${cert.customerName}</b>,</p>
-        <p>Please find attached your Heat Treatment Certificate.</p>
-        <p>Thank you,<br>Shree Jalaram Pallets Team</p>
-      `,
-    attachments: [
-        {
-          filename: `${certificateNo}.pdf`,
-          content: pdfBuffer,
-          contentType: 'application/pdf',
-        },
-      ],
-    });
+ await resend.emails.send({
+  from: 'Shree Jalaram Pallets <info@jalarampallets.com>',
+  to: email,
+  bcc: 'yvyas9646@gmail.com',
+  reply_to: 'yvyas9646@gmail.com',
+  subject: `Heat Treatment Certificate – ${certificateNo}`,
+  html: `
+    <p>Dear <b>${cert.customerName}</b>,</p>
+    <p>Please find attached your Heat Treatment Certificate.</p>
+    <p>Thank you,<br>Shree Jalaram Pallets Team</p>
+  `,
+  attachments: [
+    {
+      filename: `${certificateNo}.pdf`,
+      content: pdfBuffer.toString('base64'),   // ✅ base64 encoded
+      type: 'application/pdf',                 // ✅ MIME type
+      disposition: 'attachment',               // ✅ ensures Gmail handles it right
+    },
+  ],
+});
+
+
 
     // Optionally save the sent info in the DB
     cert.lastEmailSent = { to: email, sentAt: new Date() };
